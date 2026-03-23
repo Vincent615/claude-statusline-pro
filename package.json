@@ -1,0 +1,31 @@
+{
+  "name": "claude-statusline-pro",
+  "version": "1.0.0",
+  "description": "Premium Claude Code statusline with rate limits, context bar, git info — using official API only",
+  "bin": {
+    "claude-statusline-pro": "./bin/install.js"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "statusline",
+    "rate-limits",
+    "cli",
+    "terminal",
+    "developer-tools"
+  ],
+  "license": "MIT",
+  "author": "Vincent Su",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Vincent615/claude-statusline-pro"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "bin/",
+    "README.md",
+    "LICENSE"
+  ]
+}
