@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Premium Claude Code statusline with rate limits, context bar, git info — using official API only",
   "bin": {
-    "claude-statusline-pro": "./bin/install.js"
+    "claude-statusline-pro": "bin/install.js"
   },
   "keywords": [
     "claude",
@@ -18,7 +18,7 @@
   "author": "Vincent Su",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Vincent615/claude-statusline-pro"
+    "url": "git+https://github.com/Vincent615/claude-statusline-pro.git"
   },
   "engines": {
     "node": ">=16.0.0"
