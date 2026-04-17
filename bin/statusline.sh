@@ -180,6 +180,13 @@ fmt_duration() {
   fi
 }
 
+# ── Source guard ─────────────────────────────────────────────
+# When sourced (e.g. by Bats tests), expose helper functions only
+# and skip the main pipeline. When executed directly, proceed.
+if [ "${BASH_SOURCE[0]}" != "${0}" ]; then
+  return 0
+fi
+
 # ── Read input ──────────────────────────────────────────────
 input=$(cat)
 [ -z "$input" ] && exit 0
