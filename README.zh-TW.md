@@ -139,23 +139,24 @@ sudo pacman -S jq git
 
 ## 自訂
 
-腳本安裝後位於 `~/.claude/statusline.sh`，可直接編輯。
+所有使用者可調整的設定都放在 `~/.claude/statusline.config.sh` — 這是主腳本在套用 defaults 後會 source 的 bash 檔。在此檔設定的任何變數都會 override 預設值。
+
+> **升級會保留你的 config。** 再次執行 `npx claude-statusline-pro` 只會更新 `statusline.sh`，不會動 `statusline.config.sh`。
 
 ### 儀表寬度
 
-修改第 11 行的 `GAUGE_WIDTH`（窄終端會自動縮小）：
-
 ```bash
-GAUGE_WIDTH=13    # 預設（104 級精度）
+# ~/.claude/statusline.config.sh
 GAUGE_WIDTH=20    # 更寬（160 級精度）
 GAUGE_WIDTH=8     # 精簡
 ```
 
 ### 顏色
 
-每種顏色以 24-bit RGB 定義在腳本頂部：
+每種顏色以 24-bit RGB 定義。在 `statusline.config.sh` 取消註解任一變數即可 override：
 
 ```bash
+# ~/.claude/statusline.config.sh
 C_BRAND=$'\033[38;2;120;119;255m'    # ◆ 模型名稱
 C_ACCENT=$'\033[38;2;99;215;190m'    # 目錄名稱
 C_BRANCH=$'\033[38;2;130;220;160m'   # Git 分支
@@ -166,10 +167,10 @@ C_TRACK=$'\033[38;2;30;34;40m'       # 空白軌道 ▁
 
 ### 自適應寬度門檻
 
-腳本會自動偵測終端寬度。修改第 16 行調整門檻：
-
 ```bash
-if (( COLS < 100 )); then    # 調整此數值
+# ~/.claude/statusline.config.sh
+NARROW_THRESHOLD=80    # 低於 80 欄觸發窄模式
+NARROW_THRESHOLD=0     # 完全停用窄模式
 ```
 
 ## 運作原理

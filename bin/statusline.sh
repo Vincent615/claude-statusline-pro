@@ -4,24 +4,16 @@
 # 100% official API · zero external calls · zero OAuth
 # ──────────────────────────────────────────────────────────────
 
-# ── Configuration ────────────────────────────────────────────
+# ── Defaults (override in ~/.claude/statusline.config.sh) ────
 # Language: "en" (English) or "zh" (繁體中文)
 LANG_CODE="en"
-# Gauge width (auto-adjusted for narrow terminals)
+# Gauge width (forced to 8 when terminal is narrower than NARROW_THRESHOLD)
 GAUGE_WIDTH=13
+# Narrow-terminal threshold: below this many columns, gauge shrinks
+# and token count is hidden. Set to 0 to disable narrow mode entirely.
+NARROW_THRESHOLD=100
 
-# ── Terminal width detection ─────────────────────────────────
-COLS=$(tput cols 2>/dev/null || echo 120)
-SHOW_TOKENS=1
-if (( COLS < 100 )); then
-  GAUGE_WIDTH=8
-  SHOW_TOKENS=0
-fi
-
-# ── Dependency check ─────────────────────────────────────────
-command -v jq >/dev/null 2>&1 || { echo "◆ install jq for statusline-pro"; exit 0; }
-
-# ── Colors (24-bit RGB) ─────────────────────────────────────
+# ── Colors (24-bit RGB) — override in config ────────────────
 C_BRAND=$'\033[38;2;120;119;255m'
 C_ACCENT=$'\033[38;2;99;215;190m'
 C_TEXT=$'\033[38;2;210;215;220m'
@@ -32,6 +24,22 @@ C_DIRTY=$'\033[38;2;255;140;90m'
 C_FRAME=$'\033[38;2;42;48;56m'
 C_TRACK=$'\033[38;2;30;34;40m'
 C_RESET=$'\033[0m'
+
+# ── Load user config (overrides defaults; survives upgrades) ─
+# Edit ~/.claude/statusline.config.sh — npx upgrades only touch
+# this script; your config is preserved.
+[ -f "$HOME/.claude/statusline.config.sh" ] && source "$HOME/.claude/statusline.config.sh"
+
+# ── Terminal width detection ─────────────────────────────────
+COLS=$(tput cols 2>/dev/null || echo 120)
+SHOW_TOKENS=1
+if (( NARROW_THRESHOLD > 0 && COLS < NARROW_THRESHOLD )); then
+  GAUGE_WIDTH=8
+  SHOW_TOKENS=0
+fi
+
+# ── Dependency check ─────────────────────────────────────────
+command -v jq >/dev/null 2>&1 || { echo "◆ install jq for statusline-pro"; exit 0; }
 
 # ── Smooth gradient (101 colors, single awk call) ────────────
 GRADIENT=()

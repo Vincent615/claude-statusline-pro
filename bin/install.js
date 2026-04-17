@@ -30,6 +30,8 @@ const TARGET = path.join(CLAUDE_DIR, 'statusline.sh');
 const BACKUP = TARGET + '.bak';
 const SETTINGS = path.join(CLAUDE_DIR, 'settings.json');
 const SOURCE = path.join(__dirname, 'statusline.sh');
+const CONFIG_TARGET = path.join(CLAUDE_DIR, 'statusline.config.sh');
+const CONFIG_SOURCE = path.join(__dirname, 'statusline.config.sh');
 
 // ── Helpers ─────────────────────────────────────────────────
 function commandExists(cmd) {
@@ -51,6 +53,25 @@ function readJson(filepath) {
 
 function writeJson(filepath, obj) {
   fs.writeFileSync(filepath, JSON.stringify(obj, null, 2) + '\n', 'utf8');
+}
+
+function ensureConfig() {
+  if (!fs.existsSync(CONFIG_TARGET)) {
+    fs.copyFileSync(CONFIG_SOURCE, CONFIG_TARGET);
+    return true;
+  }
+  return false;
+}
+
+function writeLangToConfig(lang) {
+  ensureConfig();
+  let content = fs.readFileSync(CONFIG_TARGET, 'utf8');
+  if (/^LANG_CODE=/m.test(content)) {
+    content = content.replace(/^LANG_CODE=.*/m, `LANG_CODE="${lang}"`);
+  } else {
+    content += `\nLANG_CODE="${lang}"\n`;
+  }
+  fs.writeFileSync(CONFIG_TARGET, content, 'utf8');
 }
 
 // ── Install ─────────────────────────────────────────────────
@@ -95,8 +116,10 @@ function install() {
     ok('Created ~/.claude/');
   }
 
-  // Backup existing statusline
-  if (fs.existsSync(TARGET)) {
+  // Backup existing statusline — first install only.
+  // Without this guard, re-installs would clobber the user's original
+  // statusline with a previous statusline-pro version.
+  if (fs.existsSync(TARGET) && !fs.existsSync(BACKUP)) {
     fs.copyFileSync(TARGET, BACKUP);
     ok('Backed up existing statusline.sh → statusline.sh.bak');
   }
@@ -104,16 +127,20 @@ function install() {
   // Copy script
   fs.copyFileSync(SOURCE, TARGET);
   fs.chmodSync(TARGET, 0o755);
+  ok('Installed statusline.sh → ~/.claude/statusline.sh');
 
-  // Apply language setting
+  // Install or preserve config (survives upgrades)
+  if (ensureConfig()) {
+    ok('Installed config → ~/.claude/statusline.config.sh');
+  } else {
+    ok('Preserved existing config → ~/.claude/statusline.config.sh');
+  }
+
+  // Apply language setting (writes to config, not main script)
   const isZh = args.includes('--zh') || args.includes('--chinese');
   if (isZh) {
-    let content = fs.readFileSync(TARGET, 'utf8');
-    content = content.replace('LANG_CODE="en"', 'LANG_CODE="zh"');
-    fs.writeFileSync(TARGET, content, 'utf8');
-    ok('Installed statusline.sh → ~/.claude/statusline.sh (繁體中文)');
-  } else {
-    ok('Installed statusline.sh → ~/.claude/statusline.sh (English)');
+    writeLangToConfig('zh');
+    ok('Language → 繁體中文');
   }
 
   // Update settings.json
@@ -169,6 +196,13 @@ function uninstall() {
     }
   }
 
+  // Config is preserved — user may reinstall or switch to another statusline
+  if (fs.existsSync(CONFIG_TARGET)) {
+    log('');
+    log(`  ${c.dim}→ Config preserved at ~/.claude/statusline.config.sh${c.reset}`);
+    log(`  ${c.dim}  Delete manually if no longer needed.${c.reset}`);
+  }
+
   log('');
   log(`  ${c.green}Uninstall complete.${c.reset} ${c.dim}Restart Claude Code to apply.${c.reset}`);
   log('');
@@ -182,9 +216,7 @@ function switchLang(lang) {
     process.exit(1);
   }
 
-  let content = fs.readFileSync(TARGET, 'utf8');
-  content = content.replace(/LANG_CODE="(en|zh)"/, `LANG_CODE="${lang}"`);
-  fs.writeFileSync(TARGET, content, 'utf8');
+  writeLangToConfig(lang);
 
   const label = lang === 'zh' ? '繁體中文' : 'English';
   ok(`Switched to ${label}`);

@@ -150,23 +150,24 @@ Standard progress bars have resolution equal to their width (13 chars = 13 level
 
 ## Customization
 
-The script lives at `~/.claude/statusline.sh`. Edit directly.
+All user-editable settings live in `~/.claude/statusline.config.sh` — a bash file sourced by the main script after defaults are applied. Any variable you set there overrides the default.
+
+> **Upgrades preserve your config.** Running `npx claude-statusline-pro` again will update `statusline.sh` but leave `statusline.config.sh` untouched.
 
 ### Gauge Width
 
-Change `GAUGE_WIDTH` on line 11 (auto-adjusted for narrow terminals):
-
 ```bash
-GAUGE_WIDTH=13    # Default (104 levels of precision)
-GAUGE_WIDTH=20    # Wider (160 levels)
+# ~/.claude/statusline.config.sh
+GAUGE_WIDTH=20    # Wider (160 levels of precision)
 GAUGE_WIDTH=8     # Compact
 ```
 
 ### Colors
 
-Each color is defined as a 24-bit RGB escape code near the top of the script:
+Each color is a 24-bit RGB escape code. Uncomment any variable in `statusline.config.sh` to override:
 
 ```bash
+# ~/.claude/statusline.config.sh
 C_BRAND=$'\033[38;2;120;119;255m'    # ◆ model name
 C_ACCENT=$'\033[38;2;99;215;190m'    # Directory name
 C_BRANCH=$'\033[38;2;130;220;160m'   # Git branch
@@ -177,10 +178,10 @@ C_TRACK=$'\033[38;2;30;34;40m'       # Empty track ▁
 
 ### Adaptive Width Threshold
 
-The script auto-detects terminal width. Change the threshold on line 16:
-
 ```bash
-if (( COLS < 100 )); then    # Adjust this number
+# ~/.claude/statusline.config.sh
+NARROW_THRESHOLD=80    # Trigger narrow mode below 80 columns
+NARROW_THRESHOLD=0     # Disable narrow mode entirely
 ```
 
 ## How It Works
