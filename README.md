@@ -2,6 +2,8 @@
 
 # ◆ claude-statusline-pro
 
+[![CI](https://github.com/Vincent615/claude-statusline-pro/actions/workflows/ci.yml/badge.svg)](https://github.com/Vincent615/claude-statusline-pro/actions/workflows/ci.yml)
+
 A real-time terminal dashboard for Claude Code — gradient gauges for context window, rate limits, session cost, and git status. Official API only, zero external calls.
 
 ```

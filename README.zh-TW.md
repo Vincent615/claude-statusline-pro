@@ -2,6 +2,8 @@
 
 # ◆ claude-statusline-pro
 
+[![CI](https://github.com/Vincent615/claude-statusline-pro/actions/workflows/ci.yml/badge.svg)](https://github.com/Vincent615/claude-statusline-pro/actions/workflows/ci.yml)
+
 Claude Code 的即時終端儀表板 — 用漸層進度條顯示上下文用量、API 配額、session 成本和 git 狀態。僅使用官方 API，零外部呼叫。
 
 ```
